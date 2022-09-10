@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,7 +36,7 @@ public class UserController {
     }
 
     @PostMapping("/user")
-    public ResponseEntity<?> saveUser(@RequestBody User user) throws UserAlreadyExistException {
+    public ResponseEntity<?> saveUser(@Valid @RequestBody User user) throws UserAlreadyExistException {
         // Check If userName is already exist
         User userExisting = userService.fetchUserByUserName(user.getUserName());
         if (userExisting != null) {
