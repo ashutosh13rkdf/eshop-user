@@ -1,5 +1,7 @@
 package com.eshop.user.controller;
 
+import com.eshop.user.exception.UserAlreadyExistException;
+import com.eshop.user.exception.UserNotFoundException;
 import com.eshop.user.model.User;
 import com.eshop.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,65 +17,54 @@ import java.util.Optional;
 public class UserController {
     @Autowired
     private UserService userService;
+
     @GetMapping("/user")
-    public ResponseEntity<?> getAllUsers(){
+    public ResponseEntity<?> getAllUsers() {
         Optional<List<User>> users = Optional.ofNullable(userService.fetchUserList());
-        if(users.isPresent()){
-            return ResponseEntity.ok(users.get());
-        }else{
-           return (ResponseEntity<?>) ResponseEntity.noContent();
-        }
+        return ResponseEntity.ok(users.get());
 
     }
+
     @GetMapping("/user/{id}")
-    public ResponseEntity<?> getUserById(@PathVariable Integer id){
+    public ResponseEntity<?> getUserById(@PathVariable Integer id) throws UserNotFoundException {
         Optional<User> user = userService.fetchUserById(id);
-        if(user.isEmpty()){
-            return new ResponseEntity<>("User not found!!", HttpStatus.NO_CONTENT);
+        if (user.isEmpty()) {
+            throw new UserNotFoundException("User does not exist!!");
         }
-        if(user.isPresent()){
-            return ResponseEntity.ok(user.get());
-        }else{
-            return (ResponseEntity<?>) ResponseEntity.noContent();
-        }
+        return ResponseEntity.ok(user.get());
     }
 
     @PostMapping("/user")
-    public ResponseEntity<?> saveUser(@RequestBody User user){
+    public ResponseEntity<?> saveUser(@RequestBody User user) throws UserAlreadyExistException {
         // Check If userName is already exist
         User userExisting = userService.fetchUserByUserName(user.getUserName());
-        if(userExisting != null){
-            return new ResponseEntity<>("User already exists!!", HttpStatus.OK);
+        if (userExisting != null) {
+            throw new UserAlreadyExistException("User already exists!!");
         }
         User userFromDB = userService.saveUser(user);
-        if(userFromDB != null){
-            return new ResponseEntity<>(HttpStatus.CREATED);
-        } else {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity<>(HttpStatus.CREATED);
 
     }
+
     @PutMapping("/user")
-    public ResponseEntity<?> updateUser(@RequestBody User user){
+    public ResponseEntity<?> updateUser(@RequestBody User user) throws UserNotFoundException {
         // Check If user exist
         User userExisting = userService.fetchUserByUserName(user.getUserName());
-        if(userExisting == null){
-            return new ResponseEntity<>("User does not exists!!", HttpStatus.OK);
+        if (userExisting == null) {
+            throw new UserNotFoundException("User does not exist!!");
         }
         User userFromDB = userService.saveUser(user);
-        if(userFromDB != null){
-            return new ResponseEntity<>(userFromDB,HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity<>(userFromDB, HttpStatus.OK);
+
 
     }
+
     @DeleteMapping("/user/{id}")
-    public ResponseEntity<?> deleteUserById(@PathVariable Integer id){
+    public ResponseEntity<?> deleteUserById(@PathVariable Integer id) throws UserNotFoundException {
         // Check If user exist
         Optional<User> userExisting = userService.fetchUserById(id);
-        if(userExisting.isEmpty()){
-            return new ResponseEntity<>("User does not exists!!", HttpStatus.OK);
+        if (userExisting.isEmpty()) {
+            throw new UserNotFoundException("User does not exist!!");
         }
         userService.deleteUserById(id);
         return new ResponseEntity<>("User deleted successfully!!", HttpStatus.OK);
