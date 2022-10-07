@@ -4,6 +4,8 @@ import com.eshop.user.exception.UserAlreadyExistException;
 import com.eshop.user.exception.UserNotFoundException;
 import com.eshop.user.model.User;
 import com.eshop.user.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,8 +16,10 @@ import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
+
 @RestController
 public class UserController {
+    private static Logger log = LoggerFactory.getLogger(UserController.class);
     @Autowired
     private UserService userService;
 
@@ -28,6 +32,7 @@ public class UserController {
 
     @GetMapping("/user/{id}")
     public ResponseEntity<?> getUserById(@PathVariable Integer id) throws UserNotFoundException {
+        log.info("get user by id");
         Optional<User> user = userService.fetchUserById(id);
         if (user.isEmpty()) {
             throw new UserNotFoundException("User does not exist!!");
