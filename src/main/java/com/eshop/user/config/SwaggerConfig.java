@@ -15,7 +15,7 @@ import java.util.Collections;
 public class SwaggerConfig {
 
     private ApiInfo apiInfo() {
-        return new ApiInfo("MyApp Rest APIs",
+        return new ApiInfo("EShop Rest APIs",
                 "APIs for MyApp.",
                 "1.0",
                 "Terms of service",
