@@ -1,6 +1,8 @@
 server:
   port: 9091
 spring:
+#  application:
+#    name: user-svc
   datasource:
     driverClassName: com.mysql.jdbc.Driver
     url: jdbc:mysql://localhost:3306/eshop
